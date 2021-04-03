@@ -9,8 +9,8 @@ clock = pg.time.Clock()
 
 barrier_size = 2
 block_size = 35
-grid_w = 28
-grid_h = 20
+grid_w = 27  # 27
+grid_h = 19  # 19
 
 
 sw = 1001
@@ -100,17 +100,18 @@ class Box(object):
 
         self.array_x, self.array_y = pos
         self.a_pos = pos
-        self.x = barrier_size * self.array_x + block_size * (self.array_x - 1)
-        self.y = barrier_size * self.array_y + block_size * (self.array_y - 1)
+
+        self.x = barrier_size * self.array_x + block_size * (self.array_x - 1) + 37
+        self.y = barrier_size * self.array_y + block_size * (self.array_y - 1) + 37  # fix this!!! maybe fixed?
         self.w = block_size
         self.h = block_size
 
 
     def update_state(self, grid_in, mouse_button):
-        if mouse_button == 1 and self.collision_detect() and not self.flag:
+        if mouse_button == 1 and not self.flag:
             self.hidden = False
             # left pressed = uncover
-        if mouse_button == 3 and self.collision_detect():
+        if mouse_button == 3:
             if self.hidden:
                 if self.flag:
                     self.flag = False
@@ -138,6 +139,9 @@ class Box(object):
                     pos_to_update.append(ii.a_pos)
                     if ii.bomb:
                         bomb_count += 1
+                        print("heyyyy")
+                        print(self.a_pos)
+                        print(ii.a_pos)
 
         self.number = bomb_count
 
@@ -174,8 +178,7 @@ class Box(object):
             else:
                 pass
         if self.bomb:
-            # pg.draw.rect(win, (0, 50, 150), (self.x + 5, self.y + 5, self.w - 10, self.h - 10))
-            pass
+            pg.draw.rect(win, (0, 50, 150), (self.x + 5, self.y + 5, self.w - 10, self.h - 10))
         if self.flag:
             pg.draw.rect(win, (252, 87, 66), (self.x + 8, self.y + 8, self.w - 16, self.h - 16))
 
@@ -183,12 +186,6 @@ class Box(object):
 def redraw_game_window():
     win.fill(screen_color)
 
-    size_z = 35
-    edge_z = 2
-    pg.draw.rect(win, (130, 130, 130), (edge_z, edge_z, size_z, size_z))
-    pg.draw.rect(win, (150, 150, 150), (2 * edge_z + size_z, edge_z, size_z, size_z))
-    pg.draw.rect(win, (150, 150, 150), (edge_z, edge_z * 2 + size_z, size_z, size_z))
-    pg.draw.rect(win, (150, 150, 150), (edge_z * 2 + size_z, edge_z * 2 + size_z, size_z, size_z))
 
     grid.draw(win)
 
