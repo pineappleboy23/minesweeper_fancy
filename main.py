@@ -49,9 +49,11 @@ class Grid(object):
     def update_grid(self, mouse_key):
         for i in self.grid:
             for ii in i:
-                grid_clone = self.grid
-                for pp in ii.update_state(grid_clone, mouse_key):
-                    self.grid_positions_to_update.append(pp)
+                if ii.collision_detect():
+                    grid_clone = self.grid
+                    for pp in ii.update_state(grid_clone, mouse_key):
+                        self.grid_positions_to_update.append(pp)
+
 
         while len(self.grid_positions_to_update) > 0:
             self.grid_positions_to_update = self.clear_blank_space()
@@ -172,7 +174,8 @@ class Box(object):
             else:
                 pass
         if self.bomb:
-            pg.draw.rect(win, (0, 50, 150), (self.x + 5, self.y + 5, self.w - 10, self.h - 10))
+            # pg.draw.rect(win, (0, 50, 150), (self.x + 5, self.y + 5, self.w - 10, self.h - 10))
+            pass
         if self.flag:
             pg.draw.rect(win, (252, 87, 66), (self.x + 8, self.y + 8, self.w - 16, self.h - 16))
 
