@@ -52,7 +52,10 @@ class Grid(object):
                 if ii.collision_detect():
                     grid_clone = self.grid
                     for pp in ii.update_state(grid_clone, mouse_key):
-                        self.grid_positions_to_update.append(pp)
+                        if len(pp) == 2:
+                            self.grid_positions_to_update.append(pp)
+                        else:
+                            self.grid[pp[1]][pp[0]].flag = True
 
 
         while len(self.grid_positions_to_update) > 0:
@@ -108,10 +111,38 @@ class Box(object):
 
 
     def update_state(self, grid_in, mouse_button):
+        flag_counter = 0
+        return_pos_from_num_click = []
+        hidden_counter = 0 # for flag adding purposes
         if mouse_button == 1 and not self.flag:
+            if not self.hidden and self.number > 0:
+                for i in grid_in:
+                    for ii in i:
+                        if ii.flag:
+                            if self.check_3x3(ii):
+                                flag_counter += 1
+                if flag_counter == self.number:
+                    for i in grid_in:
+                        for ii in i:
+                            if not ii.flag:
+                                if self.check_3x3(ii):
+                                    return_pos_from_num_click.append(ii.a_pos)
             self.hidden = False
             # left pressed = uncover
         if mouse_button == 3:
+            if not self.hidden and self.number > 0:
+                for i in grid_in:
+                    for ii in i:
+                        if ii.hidden:
+                            if self.check_3x3(ii):
+                                hidden_counter += 1
+                if hidden_counter == self.number:
+                    for i in grid_in:
+                        for ii in i:
+                            if ii.hidden:
+                                if self.check_3x3(ii):
+                                    t_temp = (ii.a_pos[0], ii.a_pos[1], 1)
+                                    return_pos_from_num_click.append(t_temp)
             if self.hidden:
                 if self.flag:
                     self.flag = False
@@ -119,9 +150,9 @@ class Box(object):
                     self.flag = True
             # right pressed = flag
         if not self.hidden:
-            return self.update_number(grid_in, "state")
+            return self.update_number(grid_in, "state") + return_pos_from_num_click
         else:
-            return []
+            return return_pos_from_num_click
 
 
     def collision_detect(self):
@@ -139,9 +170,6 @@ class Box(object):
                     pos_to_update.append(ii.a_pos)
                     if ii.bomb:
                         bomb_count += 1
-                        print("heyyyy")
-                        print(self.a_pos)
-                        print(ii.a_pos)
 
         self.number = bomb_count
 
@@ -178,7 +206,8 @@ class Box(object):
             else:
                 pass
         if self.bomb:
-            pg.draw.rect(win, (0, 50, 150), (self.x + 5, self.y + 5, self.w - 10, self.h - 10))
+            # pg.draw.rect(win, (0, 50, 150), (self.x + 5, self.y + 5, self.w - 10, self.h - 10))
+            pass
         if self.flag:
             pg.draw.rect(win, (252, 87, 66), (self.x + 8, self.y + 8, self.w - 16, self.h - 16))
 
@@ -198,6 +227,8 @@ def redraw_game_window():
 grid = Grid()
 
 
+
+
 running = True
 while running:
 
@@ -207,12 +238,9 @@ while running:
         if event.type == pg.QUIT:
             running = False
         if event.type == pg.MOUSEBUTTONUP:
-            print(event)
             if event.button == 1:
-                print("1")
                 grid.update_grid(1)
             if event.button == 3:
-                print("3")
                 grid.update_grid(3)
 
 
